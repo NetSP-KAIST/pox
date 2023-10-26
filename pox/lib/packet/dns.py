@@ -375,19 +375,19 @@ class dns(packet_base):
     def _read_dns_name_from_index(cls, l, index, retlist):
       try:
         while True:
-            chunk_size = ord(l[index])
+            chunk_size = l[index]
 
             # check whether we have an internal pointer
             if (chunk_size & 0xc0) == 0xc0:
                 # pull out offset from last 14 bits
-                offset = ((ord(l[index]) & 0x3) << 8 ) | ord(l[index+1])
+                offset = ((l[index] & 0x3) << 8 ) | l[index+1]
                 cls._read_dns_name_from_index(l, offset, retlist)
                 index += 1
                 break
             if chunk_size == 0:
                 break
             index += 1
-            retlist.append(l[index : index + chunk_size])
+            retlist.append(l[index : index + chunk_size].decode('utf-8'))
             index += chunk_size
         return index
       except IndexError:
